@@ -4,6 +4,7 @@ namespace BancoDigitalDesafio.Repositories;
 
 public interface IUserRepository
 {
-    public User findUserByDocument(string document);
-    public User findUserById(int id);
+    public void ValidateTransaction(User sender, int amount);
+    public User FindUserByDocument(string document);
+    public User FindUserById(int id);
 }
