@@ -27,19 +27,23 @@
         <Link>.dockerignore</Link>
       </Content>
       <Content Remove="Repositories\UserRepository\**" />
+      <Content Remove="Manager\**" />
     </ItemGroup>
 
     <ItemGroup>
       <Compile Remove="Repositories\UserRepository\**" />
       <Compile Remove="Services\Response\Payload.cs" />
+      <Compile Remove="Manager\**" />
     </ItemGroup>
 
     <ItemGroup>
       <EmbeddedResource Remove="Repositories\UserRepository\**" />
+      <EmbeddedResource Remove="Manager\**" />
     </ItemGroup>
 
     <ItemGroup>
       <None Remove="Repositories\UserRepository\**" />
+      <None Remove="Manager\**" />
     </ItemGroup>
 
 </Project>

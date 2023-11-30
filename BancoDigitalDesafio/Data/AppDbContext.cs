@@ -7,6 +7,8 @@ namespace BancoDigitalDesafio.Data;
 
 public class AppDbContext : DbContext
 {
+    public AppDbContext(DbContextOptions<AppDbContext> context): base(context){}
+
     public DbSet<User> Users { get; set; }
     public DbSet<TransactionOp> Transactions { get; set; }
 

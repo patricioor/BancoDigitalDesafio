@@ -3,7 +3,7 @@ using BancoDigitalDesafio.Services.Interfaces;
 
 namespace BancoDigitalDesafio.Repositories;
 
-public class NotificationRepository
+public class NotificationRepository : INotificationRepository
 {
     private readonly INotificationSenderIntegration _notificationSender;
 
@@ -15,7 +15,7 @@ public class NotificationRepository
         var email = user.Email;
         var notificationResponse = _notificationSender.NotificationIntegration(email, message).ToString();
 
-        if (!notificationResponse.Equals("false"))
+        if (!notificationResponse.Equals("True"))
         {
             Console.WriteLine("Erro ao enviar notificação");
             throw new Exception("Serviço de notificação está fora do ar");

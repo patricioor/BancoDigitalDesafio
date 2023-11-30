@@ -1,6 +1,4 @@
-using BancoDigitalDesafio.Services.Interfaces;
-using BancoDigitalDesafio.Services.Refit;
-using Refit;
+using BancoDigitalDesafio.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,14 +8,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-builder.Services.AddScoped<ITransactionAuthorizationIntegration, TransactionAuthorizationIntegration>();
-builder.Services.AddRefitClient<ITransactionAuthorizationRefit>()
-    .ConfigureHttpClient(
-        x =>
-        {
-            x.BaseAddress = new Uri("https://run.mocky.io");
-        });
+builder.Services.AddInfrastructure();
 
 var app = builder.Build();
 
@@ -28,7 +19,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+using var serviceScope = ((IApplicationBuilder)app).ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
 app.UseHttpsRedirection();
+
+app.UseInfrastructure();
 
 app.UseAuthorization();
 
