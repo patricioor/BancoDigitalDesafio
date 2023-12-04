@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using BancoDigitalDesafio.Domain.Transaction;
 
 namespace BancoDigitalDesafio.Domain.user;
@@ -14,6 +13,7 @@ public class User
     public int Balance { get; set; } = 0;
     public UserType UserType { get; set; }
 
-    [NotMapped]
-    public List<TransactionOp> Transactions { get; set; }
+    public int TransactionId { get; set; }
+    public IList<TransactionOp> TransactionsAsSender { get; set; } = new List<TransactionOp>();
+    public IList<TransactionOp> TransactionsAsReceiver { get; set; } = new List<TransactionOp>();
 }

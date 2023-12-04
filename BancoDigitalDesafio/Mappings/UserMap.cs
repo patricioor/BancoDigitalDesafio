@@ -51,9 +51,10 @@ public class UserMap : IEntityTypeConfiguration<User>
             .HasMaxLength(256);
 
         builder.Property(x => x.UserType)
-            .IsRequired()
-            .HasColumnName("UserType")
-            .HasConversion<string>()
-            .HasColumnType("NVARCHAR");
+            .HasConversion
+            (
+                p => p.ToString(),
+                p => (UserType)Enum.Parse(typeof(UserType), p)
+            );
     }
 }

@@ -11,7 +11,7 @@ public class TransactionAuthorizationIntegration : ITransactionAuthorizationInte
     
     public async Task<TransactionAuthorization> GetTransactionAuthorization()
     {
-        var responseData = await _transactionAuthorization.TransactionAuto();
+        var responseData = await _transactionAuthorization.TransactionAuthorization();
         if (responseData != null && responseData.IsSuccessStatusCode)
             return responseData.Content;
         return null;

@@ -1,4 +1,5 @@
 using BancoDigitalDesafio.Domain.Transaction;
+using BancoDigitalDesafio.Domain.user;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -18,16 +19,6 @@ public class TransactionMap : IEntityTypeConfiguration<TransactionOp>
             .HasColumnName("Amount")
             .HasColumnType("INT")
             .HasDefaultValue(0.01);
-
-        builder.Property(x => x.Sender)
-            .IsRequired()
-            .HasColumnName("Sender")
-            .HasColumnType("string");
-        
-        builder.Property(x => x.Receiver)
-            .IsRequired()
-            .HasColumnName("Receiver")
-            .HasColumnType("string");
 
         builder.Property(x => x.Timestamp)
             .HasColumnName("Timestamp")
