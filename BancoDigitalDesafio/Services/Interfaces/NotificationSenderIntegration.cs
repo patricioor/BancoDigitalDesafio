@@ -1,3 +1,4 @@
+using BancoDigitalDesafio.DTO;
 using BancoDigitalDesafio.Services.Refit;
 using BancoDigitalDesafio.Services.Response;
 
@@ -10,7 +11,7 @@ public class NotificationSenderIntegration : INotificationSenderIntegration
     public NotificationSenderIntegration(INotificationSenderRefit notificationSender)
         => _notificationSender = notificationSender;
     
-    public async Task<NotificationSender> NotificationIntegration(string email, string message)
+    public async Task<> NotificationIntegration(string email, string message)
     {
         var responseData = await _notificationSender.Notification(email, message);
         if (responseData != null && responseData.IsSuccessStatusCode)

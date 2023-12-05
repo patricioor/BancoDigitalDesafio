@@ -1,9 +1,7 @@
-using AutoMapper;
 using BancoDigitalDesafio.Data;
 using BancoDigitalDesafio.Domain.Transaction;
 using BancoDigitalDesafio.Domain.user;
 using BancoDigitalDesafio.DTO;
-using BancoDigitalDesafio.Services.Interfaces;
 using BancoDigitalDesafio.Services.Response;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,18 +10,29 @@ namespace BancoDigitalDesafio.Repositories;
 public class TransactionRepository : ITransactionRepository
 {
     private readonly AppDbContext _context;
-    private readonly ITransactionAuthorizationIntegration _transactionAuthorization;
     private readonly INotificationRepository _notificationRepository;
     
 
-    public TransactionRepository(AppDbContext context, ITransactionAuthorizationIntegration transactionAuthorization, INotificationRepository notificationRepository)
+    public TransactionRepository(AppDbContext context, INotificationRepository notificationRepository)
     {
         _context = context;
-        _transactionAuthorization = transactionAuthorization;
         _notificationRepository = notificationRepository;
     }
     
     public async Task<TransactionOp> CreateTransaction(TransactionDto transactionDto,TransactionAuthorization transactionAuthorization)
+    {
+        var transaction = await newTransaction(transactionDto, transactionAuthorization);
+        
+        await _context.Transactions.AddAsync(transaction);
+        await _context.SaveChangesAsync();
+
+        _notificationRepository.SendNotification(transaction.Sender, "mandou fon");
+        _notificationRepository.SendNotification(transaction.Receiver,"recebeu fonfon");
+
+        return transaction;
+    }
+
+    private async Task<TransactionOp> newTransaction(TransactionDto transactionDto, TransactionAuthorization transactionAuthorization)
     {
         var senderFound = await _context
             .Users
@@ -54,32 +63,14 @@ public class TransactionRepository : ITransactionRepository
         
         senderFound.TransactionsAsSender.Add(newTransaction);
         receiverFound.TransactionsAsReceiver.Add(newTransaction);
-        
-        await _context.Transactions.AddAsync(newTransaction);
-        await _context.SaveChangesAsync();
-
-        _notificationRepository.SendNotification(senderFound, "mandou fon");
-        _notificationRepository.SendNotification(receiverFound,"recebeu fonfon");
 
         return newTransaction;
-    }
-
-    public async Task<string> AuthorizeTransaction()
-    {
-        var result = await _transactionAuthorization.GetTransactionAuthorization() ??
-                     throw new NullReferenceException("Erro na requisição");
-        return result.Message;
-    }
-
-    public TransactionOp FindTransactionOpWithId(int id)
-    {
-        return null;
     }
     
     public void ValidateTransaction(User sender, int amount)
     {
         if (sender.UserType == UserType.MERCHANT)
-            throw new Exception("Usuário do tipo lojista não está autorizado a realizar transação");
+            throw new Exception("Usuário do tipo lojista não está autorizado a realizar transferências");
 
         if (sender.Balance.CompareTo(amount) < 0)
             throw new Exception("Usuário não tem saldo suficiente para executar a ação");

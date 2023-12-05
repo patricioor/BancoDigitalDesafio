@@ -1,5 +1,4 @@
 using BancoDigitalDesafio.Services.Response;
-using BancoDigitalDesafio.Domain.user;
 using Refit;
 
 namespace BancoDigitalDesafio.Services.Refit;

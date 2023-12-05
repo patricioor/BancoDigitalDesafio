@@ -1,8 +1,8 @@
-using BancoDigitalDesafio.Services.Response;
+using BancoDigitalDesafio.DTO;
 
 namespace BancoDigitalDesafio.Services.Interfaces;
 
 public interface INotificationSenderIntegration
 {
-    Task<NotificationSender> NotificationIntegration(string email, string message);
+    Task<NotificationDto> NotificationIntegration(string email, string message);
 }

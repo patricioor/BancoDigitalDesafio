@@ -1,3 +1,8 @@
+using BancoDigitalDesafio.Services.Response;
+
 namespace BancoDigitalDesafio.DTO;
 
-public record NotificationDto(String email, String message);
+public class NotificationDto : NotificationSender
+{
+
+}
