@@ -36,10 +36,10 @@ public static class DependencyInjection
                 });
         
         //Notification Authorize Service
-        service.AddScoped<INotificationSenderIntegration, 
-                          NotificationSenderIntegration>();
+        service.AddScoped<INotificationServiceIntegration, 
+                          NotificationServiceIntegration>();
         
-        service.AddRefitClient<INotificationSenderRefit>()
+        service.AddRefitClient<INotificationServiceRefit>()
             .ConfigureHttpClient(
                 x =>
                 {

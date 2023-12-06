@@ -1,21 +1,24 @@
+using BancoDigitalDesafio.Domain.notification;
 using BancoDigitalDesafio.Domain.user;
-using BancoDigitalDesafio.Services.Interfaces;
+using BancoDigitalDesafio.Services.Response;
 
 namespace BancoDigitalDesafio.Repositories;
 
 public class NotificationRepository : INotificationRepository
 {
-    private readonly INotificationSenderIntegration _notificationSender;
-
-    public NotificationRepository(INotificationSenderIntegration notificationSender)
-        => _notificationSender = notificationSender;
-
-    public void SendNotification(User user, string message)
+    public Notification SendNotification(User user, string message, NotificationService notificationService)
     {
-        var email = user.Email;
-        var notificationResponse = _notificationSender.NotificationIntegration(email, message).ToString();
-
-        if (!notificationResponse.Equals("True"))
+        var notification = new Notification();
+        notification.Email = user.Email;
+        notification.Message = message;
+        NotificationStatus(notificationService);
+        return notification;
+    }
+    
+    private void NotificationStatus(NotificationService notificationService)
+    {
+        var notificationResponse = notificationService;
+        if (!(bool) notificationResponse.Message)
         {
             Console.WriteLine("Erro ao enviar notificação");
             throw new Exception("Serviço de notificação está fora do ar");

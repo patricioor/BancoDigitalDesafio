@@ -1,7 +1,8 @@
-namespace BancoDigitalDesafio.Services.Response;
+namespace BancoDigitalDesafio.Domain.notification;
 
-public class NotificationSender
+public class Notification
 {
     public string? Email { get; set; }
     public string? Message { get; set; }
+    
 }

@@ -1,3 +1,4 @@
+using AutoMapper;
 using BancoDigitalDesafio.Data;
 using BancoDigitalDesafio.Domain.Transaction;
 using BancoDigitalDesafio.Domain.user;
@@ -11,39 +12,47 @@ public class TransactionRepository : ITransactionRepository
 {
     private readonly AppDbContext _context;
     private readonly INotificationRepository _notificationRepository;
-    
+    private readonly IMapper _mapper;
 
-    public TransactionRepository(AppDbContext context, INotificationRepository notificationRepository)
+    public TransactionRepository(AppDbContext context, INotificationRepository notificationRepository, IMapper mapper)
     {
         _context = context;
         _notificationRepository = notificationRepository;
+        _mapper = mapper;
     }
-    
-    public async Task<TransactionOp> CreateTransaction(TransactionDto transactionDto,TransactionAuthorization transactionAuthorization)
+
+    public async Task<TransactionDto> CreateTransaction(TransactionDto transactionDto,
+        TransactionAuthorization transactionAuthorization,
+        NotificationService notification)
     {
         var transaction = await newTransaction(transactionDto, transactionAuthorization);
-        
+
         await _context.Transactions.AddAsync(transaction);
         await _context.SaveChangesAsync();
 
-        _notificationRepository.SendNotification(transaction.Sender, "mandou fon");
-        _notificationRepository.SendNotification(transaction.Receiver,"recebeu fonfon");
+        _notificationRepository.SendNotification(transaction.Sender, "mandou fon", notification);
+        _notificationRepository.SendNotification(transaction.Receiver, "recebeu fonfon", notification);
 
-        return transaction;
+        
+        return _mapper.Map<TransactionDto>(transaction);
     }
 
-    private async Task<TransactionOp> newTransaction(TransactionDto transactionDto, TransactionAuthorization transactionAuthorization)
+    private async Task<TransactionOp> newTransaction(TransactionDto transactionDto,
+        TransactionAuthorization transactionAuthorization)
     {
         var senderFound = await _context
-            .Users
-            .FirstOrDefaultAsync(x => x.Id == transactionDto.SenderId) ?? throw new NullReferenceException("Sender not found");
-        
+                              .Users
+                              .FirstOrDefaultAsync(x => x.Id == transactionDto.SenderId)
+                          ?? throw new NullReferenceException("Sender not found");
+
         var receiverFound = await _context
-            .Users
-            .FirstOrDefaultAsync(x => x.Id == transactionDto.ReceiverId) ?? throw new NullReferenceException("Receiver not found");;
-        
+                                .Users
+                                .FirstOrDefaultAsync(x => x.Id == transactionDto.ReceiverId)
+                            ?? throw new NullReferenceException("Receiver not found");
+        ;
+
         ValidateTransaction(senderFound, transactionDto.Amount);
-        
+
         var responseMock = transactionAuthorization;
         if (!responseMock.Message.Equals("Autorizado"))
             throw new Exception("Transação não autorizada");
@@ -57,16 +66,16 @@ public class TransactionRepository : ITransactionRepository
             ReceiverId = receiverFound.Id,
             Timestamp = DateTime.Now
         };
-        
+
         senderFound.Balance -= transactionDto.Amount;
         receiverFound.Balance += transactionDto.Amount;
-        
+
         senderFound.TransactionsAsSender.Add(newTransaction);
         receiverFound.TransactionsAsReceiver.Add(newTransaction);
 
         return newTransaction;
     }
-    
+
     public void ValidateTransaction(User sender, int amount)
     {
         if (sender.UserType == UserType.MERCHANT)
