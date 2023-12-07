@@ -2,6 +2,7 @@ using BancoDigitalDesafio.Data;
 using BancoDigitalDesafio.Domain.user;
 using BancoDigitalDesafio.DTO;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace BancoDigitalDesafio.Repositories;
 
@@ -18,7 +19,11 @@ public class UserRepository : IUserRepository
 
 
     public User GetUserById(int id)
-        => _context.Users.FirstOrDefault(x => x.Id == id) 
+        => _context.Users.AsNoTracking()
+               .Include(x => x.TransactionsAsSender)
+               .Include(x => x.TransactionsAsReceiver)
+               .FirstOrDefault(x => x.Id == id)
+            
            ?? throw new NullReferenceException("User not found");
 
     public User CreateUser(UserDto user)
@@ -45,4 +50,6 @@ public class UserRepository : IUserRepository
 
     public User FindUserById(int id)
         => _context.Users.FirstOrDefault(x => x.Id == id) ?? throw new Exception("Usuário não encontrado");
+    
+    private TransactionDto Get
 }
