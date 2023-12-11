@@ -18,13 +18,13 @@ public class UserRepository : IUserRepository
     }
 
 
-    public User GetUserById(int id)
-        => _context.Users.AsNoTracking()
-               .Include(x => x.TransactionsAsSender)
-               .Include(x => x.TransactionsAsReceiver)
-               .FirstOrDefault(x => x.Id == id)
-            
-           ?? throw new NullReferenceException("User not found");
+    public UserDto GetUserById(int id)
+    {
+       var transaction = _context.Users.AsNoTracking()
+                .FirstOrDefault(x => x.Id == id)
+            ?? throw new NullReferenceException("User not found");
+       return _mapper.Map<UserDto>(transaction);
+    }
 
     public User CreateUser(UserDto user)
     {
@@ -36,7 +36,7 @@ public class UserRepository : IUserRepository
             Email = user.Email,
             Password = user.Password,
             Balance = user.Balance,
-            UserType = user.UserType
+            UserType = (UserType) user.UserType
         };
 
         var userMapped = _mapper.Map<User>(newUser);
@@ -46,10 +46,8 @@ public class UserRepository : IUserRepository
     }
 
     public User FindUserByDocument(string document)
-        => _context.Users.FirstOrDefault(x => x.Document == document) ?? throw new Exception("Usuário não encontrado");
+        => _context.Users.FirstOrDefault(x => x.Document == document) ?? throw new Exception("User not found");
 
     public User FindUserById(int id)
-        => _context.Users.FirstOrDefault(x => x.Id == id) ?? throw new Exception("Usuário não encontrado");
-    
-    private TransactionDto Get
+        => _context.Users.FirstOrDefault(x => x.Id == id) ?? throw new Exception("User not found");
 }

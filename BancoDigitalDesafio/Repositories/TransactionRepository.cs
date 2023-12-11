@@ -79,9 +79,9 @@ public class TransactionRepository : ITransactionRepository
     public void ValidateTransaction(User sender, int amount)
     {
         if (sender.UserType == UserType.MERCHANT)
-            throw new Exception("Usuário do tipo lojista não está autorizado a realizar transferências");
+            throw new Exception("Merchant type user is not authorized to make transfers");
 
         if (sender.Balance.CompareTo(amount) < 0)
-            throw new Exception("Usuário não tem saldo suficiente para executar a ação");
+            throw new Exception("User does not have enough balance to perform the action");
     }
 }
