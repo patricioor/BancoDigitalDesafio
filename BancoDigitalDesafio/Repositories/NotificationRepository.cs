@@ -8,10 +8,13 @@ public class NotificationRepository : INotificationRepository
 {
     public Notification SendNotification(User user, string message, NotificationService notificationService)
     {
-        var notification = new Notification();
-        notification.Email = user.Email;
-        notification.Message = message;
+        var notification = new Notification
+        {
+            Email = user.Email,
+            Message = message
+        };
         NotificationStatus(notificationService);
+        Console.WriteLine($"Transaction confirmation was sent to email '{notification.Email}'");
         return notification;
     }
     
@@ -20,8 +23,8 @@ public class NotificationRepository : INotificationRepository
         var notificationResponse = notificationService;
         if (!(bool) notificationResponse.Message)
         {
-            Console.WriteLine("Erro ao enviar notificação");
-            throw new Exception("Serviço de notificação está fora do ar");
+            Console.WriteLine("Error sending notification");
+            throw new Exception("Notification service is down");
         }
     }
 }

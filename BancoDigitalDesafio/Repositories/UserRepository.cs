@@ -2,6 +2,7 @@ using BancoDigitalDesafio.Data;
 using BancoDigitalDesafio.Domain.user;
 using BancoDigitalDesafio.DTO;
 using AutoMapper;
+using BancoDigitalDesafio.Data.CustomException;
 using Microsoft.EntityFrameworkCore;
 
 namespace BancoDigitalDesafio.Repositories;
@@ -20,14 +21,16 @@ public class UserRepository : IUserRepository
 
     public UserDto GetUserById(int id)
     {
-       var transaction = _context.Users.AsNoTracking()
+       var user = _context.Users.AsNoTracking()
                 .FirstOrDefault(x => x.Id == id)
-            ?? throw new NullReferenceException("User not found");
-       return _mapper.Map<UserDto>(transaction);
+                  ?? throw new HttpException(StatusCodes.Status404NotFound,"User not found");
+       return _mapper.Map<UserDto>(user);
     }
 
     public User CreateUser(UserDto user)
     {
+        SearchSimilarDocument(_mapper.Map<User>(user));
+        
         var newUser = new User()
         {
             FirstName = user.FirstName,
@@ -44,10 +47,14 @@ public class UserRepository : IUserRepository
         _context.SaveChanges();
         return userMapped;
     }
-
-    public User FindUserByDocument(string document)
-        => _context.Users.FirstOrDefault(x => x.Document == document) ?? throw new Exception("User not found");
-
-    public User FindUserById(int id)
-        => _context.Users.FirstOrDefault(x => x.Id == id) ?? throw new Exception("User not found");
+    
+    private async void SearchSimilarDocument(User user)
+    {
+        var userFound = await _context.Users.FirstOrDefaultAsync(x => x.Id == user.Id);
+        if (userFound != null)
+            throw new HttpException(StatusCodes.Status400BadRequest,"Document inserted previously registered.");
+        userFound = await _context.Users.FirstOrDefaultAsync(x => x.Email == user.Email);
+        if (userFound != null)
+            throw new HttpException(StatusCodes.Status400BadRequest,"Email inserted previously registered.");
+    }
 }

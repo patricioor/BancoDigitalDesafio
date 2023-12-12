@@ -12,8 +12,6 @@ public class User
     public string? Password { get; set; }
     public int Balance { get; set; } = 0;
     public UserType UserType { get; set; }
-
-    public int TransactionId { get; set; }
-    public IList<TransactionOp> TransactionsAsSender { get; set; } = new List<TransactionOp>();
-    public IList<TransactionOp> TransactionsAsReceiver { get; set; } = new List<TransactionOp>();
+    
+    public IList<TransactionOp> Transactions { get; set; } = new List<TransactionOp>();
 }

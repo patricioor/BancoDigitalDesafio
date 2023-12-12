@@ -19,17 +19,5 @@ public class AppDbContext : DbContext
     {
         modelBuilder.ApplyConfiguration(new UserMap());
         modelBuilder.ApplyConfiguration(new TransactionMap());
-
-        modelBuilder.Entity<User>()
-            .HasMany(x => x.TransactionsAsSender)
-            .WithOne(x => x.Sender)
-            .HasForeignKey(x => x.SenderId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<User>()
-            .HasMany(x => x.TransactionsAsReceiver)
-            .WithOne(x => x.Receiver)
-            .HasForeignKey(x => x.ReceiverId)
-            .OnDelete(DeleteBehavior.Restrict);
     }
 }

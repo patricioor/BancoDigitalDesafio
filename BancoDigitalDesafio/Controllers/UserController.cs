@@ -23,7 +23,6 @@ public class UserController : Controller
         return Ok(user);
     }
 
-
     [HttpPost]
     public IActionResult Post(UserDto user)
     {
