@@ -22,8 +22,11 @@ public class UserRepository : IUserRepository
     public UserDto GetUserById(int id)
     {
        var user = _context.Users.AsNoTracking()
-                .FirstOrDefault(x => x.Id == id)
+                      .Include(x => x.SentTransactions)
+                      .Include(x => x.ReceivedTransactions)
+                      .FirstOrDefault(x => x.Id == id)
                   ?? throw new HttpException(StatusCodes.Status404NotFound,"User not found");
+       
        return _mapper.Map<UserDto>(user);
     }
 

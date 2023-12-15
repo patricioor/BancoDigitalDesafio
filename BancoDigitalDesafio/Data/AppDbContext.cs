@@ -19,5 +19,15 @@ public class AppDbContext : DbContext
     {
         modelBuilder.ApplyConfiguration(new UserMap());
         modelBuilder.ApplyConfiguration(new TransactionMap());
+        
+        modelBuilder.Entity<TransactionOp>()
+            .HasOne(t => t.Sender)
+            .WithMany(u => u.SentTransactions)
+            .HasForeignKey(t => t.SenderId);
+
+        modelBuilder.Entity<TransactionOp>()
+            .HasOne(t => t.Receiver)
+            .WithMany(u => u.ReceivedTransactions)
+            .HasForeignKey(t => t.ReceiverId);
     }
 }

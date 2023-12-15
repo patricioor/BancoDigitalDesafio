@@ -13,5 +13,6 @@ public class User
     public int Balance { get; set; } = 0;
     public UserType UserType { get; set; }
     
-    public IList<TransactionOp> Transactions { get; set; } = new List<TransactionOp>();
+    public IList<TransactionOp> SentTransactions { get; set; } = new List<TransactionOp>();
+    public IList<TransactionOp> ReceivedTransactions { get; set; } = new List<TransactionOp>();
 }

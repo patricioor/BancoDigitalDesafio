@@ -36,18 +36,18 @@ public class TransactionRepository : ITransactionRepository
                                 .FirstOrDefaultAsync(x => x.Id == transactionDto.ReceiverId)
                             ?? throw new HttpException(StatusCodes.Status400BadRequest,"Receiver not found");
         
-        var transaction = await newTransaction(transactionDto, transactionAuthorization, sender, receiver);
-        
-        await _context.Transactions.AddAsync(transaction);
-        await _context.SaveChangesAsync();
+        var transaction = NewTransaction(transactionDto, transactionAuthorization, sender, receiver);
 
+        AddTransactionToSender(sender, transaction);
+        AddTransactionToReceiver(receiver, transaction);
+        
         _notificationRepository.SendNotification(sender, "mandou fon", notification);
         _notificationRepository.SendNotification(receiver, "recebeu fonfon", notification);
         
         return _mapper.Map<TransactionDto>(transaction);
     }
 
-    private async Task<TransactionOp> newTransaction(TransactionDto transactionDto,
+    private TransactionOp NewTransaction(TransactionDto transactionDto,
         TransactionAuthorization transactionAuthorization,
         User sender,
         User receiver)
@@ -69,8 +69,8 @@ public class TransactionRepository : ITransactionRepository
         sender.Balance -= transactionDto.Amount;
         receiver.Balance += transactionDto.Amount;
 
-        sender.Transactions.Add(newTransaction);
-        receiver.Transactions.Add(newTransaction);
+        sender.SentTransactions.Add(newTransaction);
+        receiver.ReceivedTransactions.Add(newTransaction);
 
         return newTransaction;
     }
@@ -82,5 +82,19 @@ public class TransactionRepository : ITransactionRepository
 
         if (sender.Balance.CompareTo(amount) < 0)
             throw new Exception("User does not have enough balance to perform the action");
+    }
+
+    private async void AddTransactionToSender(User user, TransactionOp transaction)
+    {
+        user.SentTransactions.Add(transaction);
+        _context.Users.Update(user); 
+        await _context.SaveChangesAsync();
+    }
+    
+    private async void AddTransactionToReceiver(User user, TransactionOp transaction)
+    {
+        user.ReceivedTransactions.Add(transaction);
+        _context.Users.Update(user); 
+        await _context.SaveChangesAsync();
     }
 }
